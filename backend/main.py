@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import httpx
 
-GROQ_API_KEY = "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"
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = "llama-3.3-70b-versatile"
 
