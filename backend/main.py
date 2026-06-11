@@ -2,7 +2,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import httpx
-import os
+
+GROQ_API_KEY = "PASTE_YOUR_NEW_GROQ_KEY_HERE"
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL = "llama-3.3-70b-versatile"
 
 app = FastAPI(title="MedSimplify API")
 
@@ -13,14 +16,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "llama-3.3-70b-versatile"
-
 class AnalyzeRequest(BaseModel):
     report_text: str
     language: str = "english"
     mode: str = "normal"
-    api_key: str
 
 def build_prompt(report_text: str, language: str, mode: str) -> str:
     lang_note = f"Respond entirely in {language}. All explanations, labels, and text must be in {language}." if language != "english" else ""
@@ -62,8 +61,6 @@ Medical Report:
 async def analyze(req: AnalyzeRequest):
     if not req.report_text.strip():
         raise HTTPException(status_code=400, detail="Report text is empty")
-    if not req.api_key.strip():
-        raise HTTPException(status_code=400, detail="Groq API key is required")
 
     prompt = build_prompt(req.report_text, req.language, req.mode)
 
@@ -73,7 +70,7 @@ async def analyze(req: AnalyzeRequest):
                 GROQ_API_URL,
                 headers={
                     "Content-Type": "application/json",
-                    "Authorization": f"Bearer {req.api_key}",
+                    "Authorization": f"Bearer {GROQ_API_KEY}",
                 },
                 json={
                     "model": GROQ_MODEL,
