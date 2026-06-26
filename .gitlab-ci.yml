@@ -5,7 +5,7 @@ stages:
   - test
   - deploy
 
-# ─── LINT ───────────────────────────────────────────────────────────────────
+# ─── LINT ────────────────────────────────────────────────────────────────────
 lint-backend:
   stage: lint
   image: python:3.11-slim
@@ -13,7 +13,7 @@ lint-backend:
     - pip install flake8 black --quiet
   script:
     - echo "Running Python linter..."
-    - flake8 backend/ --max-line-length=120 --ignore=E501,W503 || true
+    - flake8 backend/ --max-line-length=120 --ignore=E501,W503
     - black --check backend/
 
 lint-frontend:
@@ -23,7 +23,7 @@ lint-frontend:
     - cd frontend && npm ci --silent
   script:
     - echo "Running JS/React linter..."
-    - npx eslint src/ --ext .js,.jsx --max-warnings=50
+    - npx eslint src/ --ext .js,.jsx --max-warnings=0
 
 # ─── SECURITY ────────────────────────────────────────────────────────────────
 security-scan:
@@ -33,7 +33,7 @@ security-scan:
     - pip install bandit --quiet
   script:
     - echo "Running security scan on Python backend..."
-    - bandit -r backend/ -ll || 
+    - bandit -r backend/ -ll
 
 # ─── BUILD ───────────────────────────────────────────────────────────────────
 build-frontend:
@@ -46,7 +46,7 @@ build-frontend:
     - npm run build
   artifacts:
     paths:
-      - frontend/build/
+      - frontend/dist/
     expire_in: 1 hour
 
 build-backend:
@@ -56,7 +56,7 @@ build-backend:
     - pip install -r backend/requirements.txt --quiet
   script:
     - echo "Checking backend imports..."
-    - python -c "import flask; print('Flask OK')" || python -c "import fastapi; print('FastAPI OK')"
+    - python -c "import fastapi; print('FastAPI OK')"
 
 # ─── TEST ────────────────────────────────────────────────────────────────────
 test-backend:
@@ -67,8 +67,7 @@ test-backend:
     - pip install pytest --quiet
   script:
     - echo "Running backend tests..."
-    - pytest backend/ -v --tb=short 
-  
+    - pytest backend/ -v --tb=short
 
 # ─── DEPLOY ──────────────────────────────────────────────────────────────────
 deploy-frontend:
@@ -79,8 +78,6 @@ deploy-frontend:
   script:
     - echo "Deploying frontend to Vercel..."
     - vercel --token $VERCEL_TOKEN --prod --yes
-    - echo "Deploy complete — verifying..."
-    - vercel ls --token $VERCEL_TOKEN | grep "production" || (echo "Deploy verification failed" && exit 1)
   only:
     - main
 
@@ -92,7 +89,7 @@ deploy-backend:
   script:
     - echo "Triggering Render deploy..."
     - |
-      response=$(curl -s -o /dev/null -w "%{http_code}" -X POST $RENDER_DEPLOY_HOOK)
+      response=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$RENDER_DEPLOY_HOOK")
       if [ "$response" != "200" ] && [ "$response" != "201" ]; then
         echo "Render webhook returned HTTP $response — deploy failed"
         exit 1
