@@ -12,7 +12,16 @@ export default [
           jsx: true,
         },
       },
+      globals: {
+        fetch: "readonly",
+        document: "readonly",
+        window: "readonly",
+        console: "readonly",
+      },
     },
-    rules: {},
+    rules: {
+      "no-unused-vars": "warn",
+      "no-undef": "warn",
+    },
   },
 ];

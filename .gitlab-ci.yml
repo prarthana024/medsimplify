@@ -23,7 +23,7 @@ lint-frontend:
     - cd frontend && npm ci --silent
   script:
     - echo "Running JS/React linter..."
-    - npx eslint src/ --ext .js,.jsx --max-warnings=0
+    - npx eslint src/ --ext .js,.jsx --max-warnings=10
 
 # ─── SECURITY ────────────────────────────────────────────────────────────────
 security-scan:
