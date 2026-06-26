@@ -1,4 +1,4 @@
-cat > frontend/eslint.config.js << 'EOF'
+
 import js from "@eslint/js";
 
 export default [
