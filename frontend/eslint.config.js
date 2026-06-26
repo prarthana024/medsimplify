@@ -1,4 +1,3 @@
-
 import js from "@eslint/js";
 
 export default [
@@ -17,4 +16,3 @@ export default [
     rules: {},
   },
 ];
-EOF
