@@ -64,10 +64,10 @@ test-backend:
   image: python:3.11-slim
   before_script:
     - pip install -r backend/requirements.txt --quiet
-    - pip install pytest --quiet
+    - pip install pytest httpx --quiet
   script:
     - echo "Running backend tests..."
-    - pytest backend/ -v --tb=short
+    - pytest backend/tests/ -v --tb=short
 
 # ─── DEPLOY ──────────────────────────────────────────────────────────────────
 deploy-frontend:
