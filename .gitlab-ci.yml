@@ -74,11 +74,24 @@ test-backend:
   allow_failure: true
 
 # ─── DEPLOY ──────────────────────────────────────────────────────────────────
-deploy:
+deploy-frontend:
+  stage: deploy
+  image: node:18-alpine
+  before_script:
+    - npm install -g vercel --silent
+  script:
+    - echo "Deploying frontend to Vercel..."
+    - vercel --token $VERCEL_TOKEN --prod --yes
+  only:
+    - main
+
+deploy-backend:
   stage: deploy
   image: alpine:latest
+  before_script:
+    - apk add --no-cache curl
   script:
-    - echo "Deploying medsimplify..."
-    - echo "Deploy step — add your deployment commands here"
+    - echo "Deploying backend to Render..."
+    - curl -X POST $RENDER_DEPLOY_HOOK
   only:
     - main
