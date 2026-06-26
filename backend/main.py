@@ -17,20 +17,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class AnalyzeRequest(BaseModel):
     report_text: str
     language: str = "english"
     mode: str = "normal"
 
+
 def build_prompt(report_text: str, language: str, mode: str) -> str:
-    lang_note = f"Respond entirely in {language}. All explanations, labels, and text must be in {language}." if language != "english" else ""
+    lang_note = (
+        f"Respond entirely in {language}. All explanations, labels, and text must be in {language}."
+        if language != "english"
+        else ""
+    )
     mode_note = {
         "eli5": "Use extremely simple language a 10-year-old would understand. No medical jargon at all.",
         "doctor": "Focus on generating a doctor visit summary with key questions the patient should ask their doctor.",
         "normal": "Use clear, friendly language for a patient with no medical background.",
     }.get(mode, "")
 
-    doctor_field = '"List of key questions and points for the doctor visit"' if mode == "doctor" else '"null"'
+    doctor_field = (
+        '"List of key questions and points for the doctor visit"'
+        if mode == "doctor"
+        else '"null"'
+    )
 
     return f"""You are MedSimplify, a medical report explainer. {mode_note} {lang_note}
 
@@ -57,6 +67,7 @@ Analyze this medical report and respond ONLY with a valid JSON object (no markdo
 
 Medical Report:
 {report_text}"""
+
 
 @app.post("/analyze")
 async def analyze(req: AnalyzeRequest):
@@ -95,6 +106,7 @@ async def analyze(req: AnalyzeRequest):
             raise
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/health")
 def health():
