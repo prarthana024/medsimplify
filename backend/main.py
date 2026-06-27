@@ -6,6 +6,7 @@ import httpx
 import pdfplumber
 import io
 from fastapi import File, UploadFile
+import re
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
@@ -133,6 +134,9 @@ async def extract_pdf(file: UploadFile = File(...)):
                 page_text = page.extract_text()
                 if page_text:
                     text += page_text + "\n"
-        return {"text": text.strip()}
-    except Exception as e:
+        text = re.sub(r'\n{3,}', '\n\n', text)
+        text = re.sub(r' {2,}', ' ', text)
+        text = text.strip()[:6000]
+        return {"text": text}
+        except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
