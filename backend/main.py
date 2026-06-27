@@ -100,7 +100,13 @@ async def analyze(req: AnalyzeRequest):
             data = res.json()
             raw = data["choices"][0]["message"]["content"].strip()
             clean = raw.replace("```json", "").replace("```", "").strip()
-            return {"result": clean}
+            return JSONResponse(
+            content={"result": clean},
+            headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+            "Pragma": "no-cache",
+        }
+)
 
         except httpx.TimeoutException:
             raise HTTPException(status_code=504, detail="Request timed out. Try again.")
