@@ -102,7 +102,7 @@ export default function App() {
       const res = await fetch("https://medsimplify-backend.onrender.com/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ report_text: reportText, language, mode }),
+        body: JSON.stringify({ report_text: reportText, language, mode, timestamp: Date.now() }),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
