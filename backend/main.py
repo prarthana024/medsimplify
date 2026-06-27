@@ -69,6 +69,8 @@ Medical Report:
 {report_text}"""
 
 
+from fastapi.responses import JSONResponse
+
 @app.post("/analyze")
 async def analyze(req: AnalyzeRequest):
     if not req.report_text.strip():
