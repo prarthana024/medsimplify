@@ -445,9 +445,32 @@ export default function App() {
 
   const handleFile = async (file) => {
     if (!file) return;
-    if (file.type === "text/plain") { const t = await file.text(); setReportText(t); }
-    else setReportText(`[File: ${file.name}]\n\nPlease paste the text content below for analysis.`);
-    setTab("analyze");
+    if (file.type === "application/pdf") {
+      setLoading(true);
+      setError("");
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("https://medsimplify-backend.onrender.com/extract-pdf", {
+          method: "POST",
+          body: formData,
+        });
+        if (!res.ok) throw new Error("PDF extraction failed");
+        const data = await res.json();
+        setReportText(data.text);
+        setTab("analyze");
+      } catch (e) {
+        setError("Could not extract PDF: " + e.message);
+      } finally {
+        setLoading(false);
+      }
+    } else if (file.type === "text/plain") {
+      const t = await file.text();
+      setReportText(t);
+      setTab("analyze");
+    } else {
+      setError("Please upload a PDF or TXT file. For images, paste the text manually.");
+    }
   };
 
   const analyze = async () => {
